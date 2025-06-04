@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Chat com GPT</title>
+  <style>
+    body { font-family: Arial; margin: 20px; }
+    .chat-box { max-width: 600px; margin: auto; }
+    .message { padding: 10px; border-bottom: 1px solid #ccc; }
+    .bot { color: blue; }
+    .user { color: green; }
+  </style>
+</head>
+<body>
+  <div class="chat-box" id="chat"></div>
+  <input type="text" id="user-input" placeholder="Digite sua mensagem..." style="width: 80%;">
+  <button onclick="handleSend()">Enviar</button>
+
+  <script>
+    function botSendMessage(message) {
+      const div = document.createElement('div');
+      div.className = 'message bot';
+      div.textContent = '🤖 ' + message;
+      document.getElementById('chat').appendChild(div);
+    }
+
+    function userSendMessage(message) {
+      const div = document.createElement('div');
+      div.className = 'message user';
+      div.textContent = '🧑 ' + message;
+      document.getElementById('chat').appendChild(div);
+    }
+
+    function handleSend() {
+      const input = document.getElementById('user-input');
+      const message = input.value;
+      if (!message.trim()) return;
+
+      userSendMessage(message);
+      input.value = '';
+
+      fetch('/api/gpt-response', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message })
+      })
+      .then(res => res.json())
+      .then(data => botSendMessage(data.response))
+      .catch(err => botSendMessage("Erro ao obter resposta da IA."));
+    }
+  </script>
+</body>
+</html>
